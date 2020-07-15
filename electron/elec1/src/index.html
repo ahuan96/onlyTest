@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <style>
+  </style>
+  <link rel="stylesheet" href="./css/index.css">
+</head>
+<body>
+  <div>
+    <div id="content">
+    </div>
+  </div>
+  <div  class="bot">
+    <div>
+      <input type="text" id="input">
+      <button class="el-button el-button--primary el-button--large" type="button" onclick="say()" ><span>发送消息</span></button>
+    </div>
+    <div>
+      <input style="width: 100px;" type="text" id="nick" placeholder="输入昵称">
+      <button class="el-button el-button--primary el-button--large" type="button" onclick="connect()" ><span>连接</span></button>
+    </div>
+  </div>
+  <script src="./libs/socket.io.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script> -->
+  <script>
+    let socket = ''
+    let nickInput = document.querySelector('#nick')
+
+    function connect(){
+      let nickName = nickInput.value
+      // 建立连接
+      socket = io.connect('http://localhost:3001');
+          
+      // 设置昵称
+      socket.emit('setName', { nickName });
+
+        // 监听 message 会话
+      socket.on('system', function (data) {
+        let html = document.createElement('p')
+        html.innerHTML = `<i>系统消息：</i><span>${data.msg}</span>`
+        document.getElementById('content').appendChild(html)
+        console.log(data);
+      });
+    
+      
+      socket.on('chat', function (data) {
+        let html = document.createElement('p')
+        html.innerHTML = `<i>${data.user}：</i><span>${data.msg}</span>`
+        document.getElementById('content').appendChild(html)
+        console.log(data);
+      });
+
+    }
+    
+      // 按钮点击事件
+      function say() {
+        let msg = document.getElementById('input').value
+        if (!msg) return
+        let html = document.createElement('p')
+        socket.emit('say', { msg });
+      }
+
+
+    
+ 
+  </script>
+</body>
+</html>
